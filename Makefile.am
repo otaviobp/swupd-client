@@ -33,7 +33,10 @@ AM_LDFLAGS = -z noexecstack -z relro -z now \
 ACLOCAL_AMFLAGS = -I m4
 
 bin_PROGRAMS = swupd
+noinst_LIBRARIES = libswupd.a
 
+swupd_LDADD = libswupd.a
+swupd_CFLAGS = -I$(top_srcdir)/src/
 AM_CPPFLAGS = $(AM_CFLAGS) $(libarchive_CFLAGS)
 
 swupd_SOURCES = \
@@ -80,29 +83,6 @@ swupd_SOURCES = \
 	src/helpers.c \
 	src/heuristics.c \
 	src/info.c \
-	src/lib/archives.c \
-	src/lib/archives.h \
-	src/lib/comp_functions.c \
-	src/lib/comp_functions.h \
-	src/lib/config_file.c \
-	src/lib/config_file.h \
-	src/lib/formatter_json.c \
-	src/lib/formatter_json.h \
-	src/lib/hashmap.c \
-	src/lib/hashmap.h \
-	src/lib/list.c \
-	src/lib/list.h \
-	src/lib/log.c \
-	src/lib/log.h \
-	src/lib/macros.h \
-	src/lib/strings.c \
-	src/lib/strings.h \
-	src/lib/sys.c \
-	src/lib/sys.h \
-	src/lib/thread_pool.c \
-	src/lib/thread_pool.h \
-	src/lib/timelist.c \
-	src/lib/timelist.h \
 	src/lock.c \
 	src/main.c \
 	src/manifest.c \
@@ -143,6 +123,31 @@ swupd_SOURCES = \
 	src/xattrs.c \
 	src/xattrs.h
 
+libswupd_a_SOURCES = \
+	src/lib/archives.c \
+	src/lib/archives.h \
+	src/lib/comp_functions.c \
+	src/lib/comp_functions.h \
+	src/lib/config_file.c \
+	src/lib/config_file.h \
+	src/lib/formatter_json.c \
+	src/lib/formatter_json.h \
+	src/lib/hashmap.c \
+	src/lib/hashmap.h \
+	src/lib/list.c \
+	src/lib/list.h \
+	src/lib/log.c \
+	src/lib/log.h \
+	src/lib/macros.h \
+	src/lib/strings.c \
+	src/lib/strings.h \
+	src/lib/sys.c \
+	src/lib/sys.h \
+	src/lib/thread_pool.c \
+	src/lib/thread_pool.h \
+	src/lib/timelist.c \
+	src/lib/timelist.h
+
 swupd_LDADD = \
 	$(lzma_LIBS) \
 	$(zlib_LIBS) \
@@ -151,7 +156,8 @@ swupd_LDADD = \
 	$(curl_LIBS) \
 	$(bsdiff_LIBS) \
 	$(libarchive_LIBS) \
-	$(pthread_LIBS)
+	$(pthread_LIBS) \
+	libswupd.a
 
 verifytime_SOURCES = src/verifytime.h \
 	src/verifytime.c \

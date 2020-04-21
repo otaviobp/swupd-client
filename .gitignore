@@ -58,3 +58,4 @@ unit_tests.log
 html/
 xml/
 doc-coverage.info
+libswupd.a
