@@ -37,10 +37,6 @@
 
 #define STAGE_FILE_PREFIX ".update."
 
-#define STDERR_QUIET " 2> /dev/null"
-#define TAR_CF_CMD TAR_COMMAND " -C '%s' " TAR_PERM_ATTR_ARGS " -cf - '%s'" STDERR_QUIET
-#define TAR_XF_CMD TAR_COMMAND " -C '%s' " TAR_PERM_ATTR_ARGS " -xf -" STDERR_QUIET
-
 static enum swupd_code verify_fix_path(char *target_path, struct manifest *target_mom);
 
 /* clean then recreate temporary folder for tar renames */
@@ -85,18 +81,64 @@ static bool file_type_changed(const char *statfile, struct file *file)
 		(file->is_file && !S_ISREG(s.st_mode)));  // Changed to file
 }
 
+//int run_tar_cmd_params()
+//{
+//	char **params;
+//	params = malloc(sizeof(char *) * (args_count + 2));
+//	ON_NULL_ABORT(params);
+//
+//	params[i++] = (char *)cmd;
+//
+//	va_start(ap, cmd);
+//	while ((arg = va_arg(ap, char *)) != NULL) {
+//		params[i++] = arg;
+//	}
+//	va_end(ap);
+//
+//	params[i] = NULL;
+//
+//	ret = run_command_full_params(stdout_file, stderr_file, params);
+//
+//}
+
 static int tartar(const char *source_dir, const char *source_basename, const char *target_dir)
 {
-	char *tarcommand;
-	int err;
+	char *tmp_archive;
+	int err = 0, rm_err;
 
-	tarcommand = str_or_die(TAR_CF_CMD " | " TAR_XF_CMD,
-				source_dir, source_basename, target_dir);
-	debug("Executing tartar command: %s\n", tarcommand);
+	tmp_archive = sys_path_join("%s/tmparchive.tar", globals.state_dir);
 
-	err = system(tarcommand);
+	rm_err = sys_rm_recursive(tmp_archive);
+	if (rm_err && rm_err != -ENOENT) {
+		debug("Failed to remove archive file %s %d", tmp_archive, rm_err);
+		UNEXPECTED();
+		// Removing archive fail. Trying anyway, because if it has the
+		// same type it will work
+	}
 
-	free(tarcommand);
+	//make it quiet
+	err = run_command_full(NULL, NULL, TAR_COMMAND, "-C", source_dir, TAR_PERM_ATTR_ARGS, "-cf", tmp_archive, source_basename, NULL);
+	if (err) {
+		debug("Failed to create tarball to copy file %s %d",
+		      tmp_archive, err);
+		goto cleanup;
+	}
+
+	err = run_command_full(NULL, NULL, TAR_COMMAND, "-C", target_dir, TAR_PERM_ATTR_ARGS, "-xf", tmp_archive, NULL);
+	if (err) {
+		debug("Failed to extract tarball to copy file %s %d",
+		      tmp_archive, err);
+	}
+
+cleanup:
+
+	rm_err = sys_rm_recursive(tmp_archive);
+	if (rm_err && rm_err != -ENOENT) {
+		debug("Failed to remove archive file %s %d", tmp_archive, rm_err);
+		UNEXPECTED();
+	}
+
+	free(tmp_archive);
 	return err;
 }
 

@@ -51,7 +51,7 @@ long get_available_space(const char *path);
  * If there's an error in the execution of the program 255 may also be returned
  *
  * Notes:
- * - This function doesn't execute on a shell like system() so we won't have any
+ * - This function doesn't execute on a shell like system () so we won't have any
  *   issue with parameters globbing.
  * - The full path to cmd is required.
  *

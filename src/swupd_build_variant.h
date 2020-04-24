@@ -13,7 +13,7 @@
  * for it. This has been tested in Ostro OS in combination with IMA
  * and Smack, but not with SELinux.
  */
-#define TAR_COMMAND "bsdtar"
+#define TAR_COMMAND "/usr/bin/bsdtar"
 #define TAR_XATTR_ARGS ""
 
 #else /* SWUPD_WITH_BSDTAR */
@@ -21,7 +21,7 @@
 /* GNU tar requires special options, depending on how the OS uses xattrs.
  * This has been tested in Clear Linux OS in combination with SELinux.
  */
-#define TAR_COMMAND "tar"
+#define TAR_COMMAND "/usr/bin/tar"
 #ifdef SWUPD_TAR_SELINUX
 #define TAR_XATTR_ARGS "--xattrs --xattrs-include='*' --selinux"
 #else
