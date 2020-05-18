@@ -12,6 +12,9 @@ load "../testlib"
 
 	bash "$SWUPD_DIR"/swupd.bash
 
+	# Autocomplete on clear should run on sh
+	sh "$SWUPD_DIR"/swupd.bash
+
 }
 
 @test "USA003: Autocomplete has autoupdate" {

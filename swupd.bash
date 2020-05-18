@@ -35,7 +35,7 @@ _swupd() {
           }')
 
   if [[ ${words[1]} == "3rd-party" ]]; then
-    grep -q 3rd-party <(swupd -h) || return 1
+    swupd -h | grep -q 3rd-party || return 1
 
     third_subcmds=$(swupd 3rd-party -h | sed -n -E \
                                              -e '
@@ -48,7 +48,7 @@ _swupd() {
       else
         opts=$third_subcmds
       fi
-    elif grep -q "${words[2]}" <<<"$third_subcmds"; then
+    elif echo "$third_subcmds" | grep -q "${words[2]}"; then
       if [[ $cur == -* ]]; then
         opts=$(_parse_help swupd "3rd-party ${words[2]} -h")
       fi
@@ -61,7 +61,7 @@ _swupd() {
     else
       opts="$subcmds"
     fi
-  elif grep -q "${words[1]}" <<<"$subcmds"; then
+  elif echo "$subcmds" | grep -q "${words[1]}"; then
     if [[ $cur == -* ]]; then
       # [[ $cur == -- ]] && printf "%s" "$prev"
       opts=$(_parse_help swupd "${words[1]} -h")
